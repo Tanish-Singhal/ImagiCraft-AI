@@ -10,6 +10,7 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
+import { signIn } from "next-auth/react";
 
 const Header = () => {
   return (
@@ -48,13 +49,8 @@ const Header = () => {
           </div>
           <div className="flex items-center space-x-4">
             <ModeToggle />
-            <Button asChild effect="shine" className="hidden sm:inline-flex">
-              <Link href="/generate">Create Image</Link>
-            </Button>
-            <Button asChild size="icon" className="sm:hidden" variant="ghost">
-              <Link href="/generate" aria-label="Create Image">
-                +
-              </Link>
+            <Button onClick={() => signIn("google")}>
+              Login
             </Button>
           </div>
         </div>

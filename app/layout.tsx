@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Header from "./components/Header";
+import Provider from "./provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,14 +17,17 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "ImagiCraft AI - Free High Quality AI Image Generator | Create Amazing Art",
-  description: "Create stunning AI-generated images for free. Transform your ideas into beautiful artwork using our powerful AI image generator. No credit card required, instant results.",
-  keywords: "AI image generator, free AI art, AI artwork creator, image generation, AI art maker, text to image, free image generator",
+  description:
+    "Create stunning AI-generated images for free. Transform your ideas into beautiful artwork using our powerful AI image generator. No credit card required, instant results.",
+  keywords:
+    "AI image generator, free AI art, AI artwork creator, image generation, AI art maker, text to image, free image generator",
   authors: [{ name: "ImagiCraft AI" }],
   creator: "ImagiCraft AI",
   publisher: "ImagiCraft AI",
   openGraph: {
     title: "ImagiCraft AI - Free High Quality AI Image Generator",
-    description: "Create stunning AI-generated images for free. Transform your ideas into beautiful artwork using our powerful AI image generator.",
+    description:
+      "Create stunning AI-generated images for free. Transform your ideas into beautiful artwork using our powerful AI image generator.",
     type: "website",
     url: "https://imagicraft-ai.com",
     siteName: "ImagiCraft AI",
@@ -60,8 +64,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Header />
-          {children}
+          <Provider>
+            <Header />
+            {children}
+          </Provider>
         </ThemeProvider>
       </body>
     </html>
