@@ -65,8 +65,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Provider>
-            <Header />
-            {children}
+            <div className="max-w-7xl mx-auto">
+              <Header />
+              {children}
+            </div>
           </Provider>
         </ThemeProvider>
       </body>

@@ -20,21 +20,17 @@ const Hero = () => {
             <Button
               asChild
               size="lg"
-              effect="shineHover"
+              effect="expandIcon"
               className="rounded-full"
               icon={ArrowRight}
               iconPlacement="right"
             >
-              <Link href="/generate">Start Creating</Link>
-            </Button>
-            <Button asChild variant="ghost" effect="underline">
-              <Link href="/gallery">View Gallery</Link>
+              <Link href="/create">Start Creating</Link>
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Background gradient effects */}
       <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
         <div className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-purple-500 to-pink-500 opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]" />
       </div>
