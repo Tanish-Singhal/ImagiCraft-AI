@@ -14,13 +14,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useState } from "react";
+import Image from "next/image";
 
 const formSchema = z.object({
   imagePrompt: z.string().min(5, { message: "Please provide a longer description." }),
 });
 
 const CreatePage = () => {
-  // 1. Define your form.
+  const [loading, setLoading] = useState<boolean>(false);
+  const [outputImage, setOutputImage] = useState<string | null>(null);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -28,11 +32,24 @@ const CreatePage = () => {
     },
   });
 
-  // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/image", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      const data = await response.json();
+      setOutputImage(data.url);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -60,7 +77,7 @@ const CreatePage = () => {
                 )}
               />
               <Button type="submit" className="w-full">
-                {1 ? (
+                {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Generating...
@@ -73,8 +90,18 @@ const CreatePage = () => {
           </Form>
         </div>
 
-        <div className="bg-muted rounded-lg flex items-center justify-center min-h-[400px]">
-          <p className="text-muted-foreground">Your generated image will appear here</p>
+        <div className="bg-muted rounded-lg flex items-center justify-center min-h-[400px] relative">
+          {outputImage ? (
+            <Image
+              src={outputImage}
+              alt="Generated Image"
+              className="rounded-lg"
+              width={400}
+              height={400}
+            />
+          ) : (
+            <p className="text-muted-foreground">Your generated image will appear here</p>
+          )}
         </div>
       </div>
     </div>
