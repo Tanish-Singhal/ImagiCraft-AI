@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/form";
 import { useState } from "react";
 import Image from "next/image";
+import toast from "react-hot-toast";
 
 const formSchema = z.object({
   imagePrompt: z.string().min(5, { message: "Please provide a longer description." }),
@@ -43,8 +44,19 @@ const CreatePage = () => {
         body: JSON.stringify(values),
       });
 
-      const data = await response.json();
-      setOutputImage(data.url);
+      if (response.status === 200) {
+        const data = await response.json();
+        setOutputImage(data.url);
+      }
+      else {
+        toast.error("Create account to generate images", {
+          style: {
+            borderRadius: '10px',
+            background: '#333',
+            color: '#fff',
+          },
+        });
+      }
     } catch (error) {
       console.error(error);
     } finally {

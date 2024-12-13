@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Header from "./components/Header";
 import Provider from "./provider";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,6 +49,9 @@ export const metadata: Metadata = {
       follow: true,
     },
   },
+  icons: {
+    icon: [{ url: "/favicon" }],
+  },
 };
 
 export default function RootLayout({
@@ -68,6 +72,7 @@ export default function RootLayout({
             <div className="max-w-7xl mx-auto">
               <Header />
               {children}
+              <Toaster position="bottom-right" reverseOrder={false} />
             </div>
           </Provider>
         </ThemeProvider>

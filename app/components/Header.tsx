@@ -10,7 +10,7 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useEffect, useState } from "react";
 
@@ -63,10 +63,14 @@ const Header = () => {
             {initialLoading && status === "loading" ? (
               <div className="w-10 h-10 rounded-full bg-skeleton animate-pulse" />
             ) : session ? (
-              <Avatar>
-                <AvatarImage src={session.user?.image || ""} />
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
+              <div className="flex gap-4 items-center">
+                <Button onClick={() => signOut()}>Logout</Button>
+
+                <Avatar>
+                  <AvatarImage src={session.user?.image || ""} />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+              </div>
             ) : (
               <Button onClick={() => signIn("google")}>Login</Button>
             )}
