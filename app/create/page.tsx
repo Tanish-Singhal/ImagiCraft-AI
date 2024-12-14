@@ -26,6 +26,14 @@ import { useState } from "react";
 import Image from "next/image";
 import toast from "react-hot-toast";
 
+const dimensionPresets = [
+  { label: "Square (1:1)", width: "1080", height: "1080" },
+  { label: "Portrait (2:3)", width: "1080", height: "1620" },
+  { label: "Landscape (3:2)", width: "1620", height: "1080" },
+  { label: "Mobile (9:16)", width: "1080", height: "1920" },
+  { label: "Desktop (16:9)", width: "1920", height: "1080" },
+] as const;
+
 const modelOptions = [
   { value: "flux", label: "FLUX" },
   { value: "flux-realism", label: "FLUX Realism" },
@@ -40,6 +48,7 @@ const modelOptions = [
 const formSchema = z.object({
   imagePrompt: z.string().min(5, { message: "Please provide a longer description." }),
   model: z.string().min(1, { message: "Please select a model" }),
+  dimensionPreset: z.string().min(1, { message: "Please select a dimension" }),
 });
 
 const CreatePage = () => {
@@ -51,12 +60,18 @@ const CreatePage = () => {
     defaultValues: {
       imagePrompt: "",
       model: "flux",
+      dimensionPreset: "Square (1:1)",
     },
   });
+
+  const handleDimensionPresetChange = (value: string) => {
+    form.setValue("dimensionPreset", value);
+  };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setLoading(true);
+      const preset = dimensionPresets.find((p) => p.label === values.dimensionPreset);
       const response = await fetch("/api/image", {
         method: "POST",
         headers: {
@@ -64,6 +79,8 @@ const CreatePage = () => {
         },
         body: JSON.stringify({
           ...values,
+          width: preset?.width,
+          height: preset?.height,
         }),
       });
 
@@ -124,6 +141,31 @@ const CreatePage = () => {
                         {modelOptions.map((model) => (
                           <SelectItem key={model.value} value={model.value}>
                             {model.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="dimensionPreset"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Dimension Preset</FormLabel>
+                    <Select onValueChange={handleDimensionPresetChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select dimensions" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {dimensionPresets.map((preset) => (
+                          <SelectItem key={preset.label} value={preset.label}>
+                            {preset.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
