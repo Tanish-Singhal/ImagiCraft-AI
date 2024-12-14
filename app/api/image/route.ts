@@ -30,9 +30,17 @@ export async function POST(request: NextRequest) {
 
   const imageURL = `https://image.pollinations.ai/prompt/${encodeURIComponent(
     body.imagePrompt
-  )}?seed=${randomSeed}&width=512&height=512&nologo=True`;
+  )}?seed=${randomSeed}&width=${body.width}&height=${body.height}&nologo=True&model=${body.model}&safe=${!body.nsfw}`;
 
-  await fetch(imageURL);
+  const response = await fetch(imageURL);
+  
+  const responseText = await response.text();
+  if (responseText.includes("NSFW content detected")) {
+    return NextResponse.json(
+      { error: "NSFW content detected. Please enable NSFW toggle or modify your prompt." },
+      { status: 500 }
+    );
+  }
 
   await prisma.post.create({
     data: {

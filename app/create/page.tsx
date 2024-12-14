@@ -7,8 +7,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -18,8 +26,20 @@ import { useState } from "react";
 import Image from "next/image";
 import toast from "react-hot-toast";
 
+const modelOptions = [
+  { value: "flux", label: "FLUX" },
+  { value: "flux-realism", label: "FLUX Realism" },
+  { value: "flux-cablyai", label: "FLUX CablyAI" },
+  { value: "flux-anime", label: "FLUX Anime" },
+  { value: "flux-3d", label: "FLUX 3D" },
+  { value: "any-dark", label: "Dark Style" },
+  { value: "flux-pro", label: "FLUX Pro" },
+  { value: "turbo", label: "Turbo" },
+] as const;
+
 const formSchema = z.object({
   imagePrompt: z.string().min(5, { message: "Please provide a longer description." }),
+  model: z.string().min(1, { message: "Please select a model" }),
 });
 
 const CreatePage = () => {
@@ -30,6 +50,7 @@ const CreatePage = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       imagePrompt: "",
+      model: "flux",
     },
   });
 
@@ -41,24 +62,40 @@ const CreatePage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify({
+          ...values,
+        }),
       });
 
+      const data = await response.json();
+
       if (response.status === 200) {
-        const data = await response.json();
         setOutputImage(data.url);
-      }
-      else {
+      } else if (response.status === 400 && data.error) {
+        toast.error(data.error, {
+          style: {
+            borderRadius: "10px",
+            background: "#333",
+            color: "#fff",
+          },
+        });
+      } else {
         toast.error("Create account to generate images", {
           style: {
-            borderRadius: '10px',
-            background: '#333',
-            color: '#fff',
+            borderRadius: "10px",
+            background: "#333",
+            color: "#fff",
           },
         });
       }
     } catch (error) {
-      console.error(error);
+      toast.error("Failed to generate image", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
     } finally {
       setLoading(false);
     }
@@ -71,6 +108,31 @@ const CreatePage = () => {
           <h1 className="text-2xl font-bold">Create Your AI Image</h1>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <FormField
+                control={form.control}
+                name="model"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Model</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a model" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {modelOptions.map((model) => (
+                          <SelectItem key={model.value} value={model.value}>
+                            {model.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="imagePrompt"
@@ -88,7 +150,8 @@ const CreatePage = () => {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
+
+              <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
