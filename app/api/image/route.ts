@@ -39,11 +39,40 @@ export async function POST(request: NextRequest) {
       prompt: body.imagePrompt,
       url: imageURL,
       seed: randomSeed,
-      userId: session.user.id,
+      userId: user.id,
     },
   });
 
   return NextResponse.json({
     url: imageURL,
   });
+}
+
+export async function GET() {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized User" }, { status: 401 });
+  }
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id: session.user.id,
+    },
+  });
+
+  if (!user) {
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
+  }
+
+  const posts = await prisma.post.findMany({
+    where: {
+      userId: session.user.id,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return NextResponse.json(posts);
 }
