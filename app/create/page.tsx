@@ -25,6 +25,7 @@ import {
 import { useState } from "react";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import { Switch } from "@/components/ui/switch";
 
 const dimensionPresets = [
   { label: "Square (1:1)", width: "1080", height: "1080" },
@@ -49,6 +50,7 @@ const formSchema = z.object({
   imagePrompt: z.string().min(5, { message: "Please provide a longer description." }),
   model: z.string().min(1, { message: "Please select a model" }),
   dimensionPreset: z.string().min(1, { message: "Please select a dimension" }),
+  nsfw: z.boolean().default(false),
 });
 
 const CreatePage = () => {
@@ -61,6 +63,7 @@ const CreatePage = () => {
       imagePrompt: "",
       model: "flux",
       dimensionPreset: "Square (1:1)",
+      nsfw: false,
     },
   });
 
@@ -189,6 +192,22 @@ const CreatePage = () => {
                       />
                     </FormControl>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="nsfw"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">NSFW Content</FormLabel>
+                      <FormDescription>Toggle to allow NSFW content generation</FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
                   </FormItem>
                 )}
               />
