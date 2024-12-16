@@ -110,6 +110,7 @@ const CreatePage = () => {
         });
       }
     } catch (error) {
+      console.error('Error generating image:', error);
       toast.error("Failed to generate image", {
         style: {
           borderRadius: "10px",
