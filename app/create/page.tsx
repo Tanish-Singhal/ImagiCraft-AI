@@ -26,6 +26,7 @@ import { useState } from "react";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { Switch } from "@/components/ui/switch";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const dimensionPresets = [
   { label: "Square (1:1)", width: "1080", height: "1080" },
@@ -122,62 +123,18 @@ const CreatePage = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6 min-h-[calc(100dvh-4rem)]">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
-        <div className="space-y-4">
-          <h1 className="text-2xl font-bold">Create Your AI Image</h1>
+    <div className="max-w-6xl mx-auto px-4 py-8 min-h-[calc(100dvh-4rem)]">
+      <div className="text-center mb-16">
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">Create Your AI Image</h1>
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          Choose your preferred model and settings to generate unique AI artwork.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+        <div className="space-y-6">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <FormField
-                control={form.control}
-                name="model"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Model</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a model" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {modelOptions.map((model) => (
-                          <SelectItem key={model.value} value={model.value}>
-                            {model.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="dimensionPreset"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Dimension Preset</FormLabel>
-                    <Select onValueChange={handleDimensionPresetChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select dimensions" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {dimensionPresets.map((preset) => (
-                          <SelectItem key={preset.label} value={preset.label}>
-                            {preset.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
                 control={form.control}
                 name="imagePrompt"
@@ -185,22 +142,79 @@ const CreatePage = () => {
                   <FormItem>
                     <FormLabel>Image Prompt</FormLabel>
                     <FormControl>
-                      <Textarea
-                        placeholder="Describe the image you want to create..."
-                        className="h-32 resize-none"
-                        {...field}
-                      />
+                      <div className="relative">
+                        <Textarea
+                          placeholder="Describe the image you want to create..."
+                          className="h-32 resize-none pr-12"
+                          {...field}
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="model"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>AI Model</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a model" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {modelOptions.map((model) => (
+                            <SelectItem key={model.value} value={model.value}>
+                              {model.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="dimensionPreset"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Aspect Ratio</FormLabel>
+                      <Select
+                        onValueChange={handleDimensionPresetChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select dimensions" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {dimensionPresets.map((preset) => (
+                            <SelectItem key={preset.label} value={preset.label}>
+                              {preset.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
               <FormField
                 control={form.control}
                 name="nsfw"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm transition-colors hover:bg-accent/50">
                     <div className="space-y-0.5">
                       <FormLabel className="text-base">NSFW Content</FormLabel>
                       <FormDescription>Toggle to allow NSFW content generation</FormDescription>
@@ -212,11 +226,11 @@ const CreatePage = () => {
                 )}
               />
 
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full transition-all" disabled={loading} size="lg">
                 {loading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating...
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Generating your masterpiece...
                   </>
                 ) : (
                   "Generate Image"
@@ -226,17 +240,24 @@ const CreatePage = () => {
           </Form>
         </div>
 
-        <div className="bg-muted rounded-lg flex items-center justify-center min-h-[400px] relative">
-          {outputImage ? (
+        <div className="bg-muted rounded-lg flex items-center justify-center min-h-[600px] relative overflow-hidden shadow-lg">
+          {loading ? (
+            <Skeleton className="w-full h-full" />
+          ) : outputImage ? (
             <Image
               src={outputImage}
               alt="Generated Image"
-              className="rounded-lg"
-              width={400}
-              height={400}
+              className="rounded-lg object-contain transition-all"
+              fill
+              priority
             />
           ) : (
-            <p className="text-muted-foreground">Your generated image will appear here</p>
+            <div className="text-center space-y-4 p-6">
+              <p className="text-muted-foreground text-lg">Your masterpiece awaits...</p>
+              <p className="text-sm text-muted-foreground">
+                Fill out the form to generate your unique AI artwork
+              </p>
+            </div>
           )}
         </div>
       </div>
