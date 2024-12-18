@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
   if (responseText.includes("NSFW content detected")) {
     return NextResponse.json(
       { error: "NSFW content detected. Please enable NSFW toggle or modify your prompt." },
-      { status: 500 }
+      { status: 400 }
     );
   }
 

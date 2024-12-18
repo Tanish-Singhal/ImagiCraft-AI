@@ -64,7 +64,7 @@ const Header = () => {
               <div className="w-10 h-10 rounded-full bg-skeleton animate-pulse" />
             ) : session ? (
               <div className="flex gap-4 items-center">
-                <Button onClick={() => signOut()}>Logout</Button>
+                <Button onClick={() => signOut()} variant="destructive" >Logout</Button>
 
                 <Avatar>
                   <AvatarImage src={session.user?.image || ""} />

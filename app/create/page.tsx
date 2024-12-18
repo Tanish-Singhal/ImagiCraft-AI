@@ -1,7 +1,7 @@
 "use client";
 
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2 } from "lucide-react";
+import { Loader2, Sparkles, ImageIcon } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -26,7 +26,6 @@ import { useState } from "react";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { Switch } from "@/components/ui/switch";
-import { Skeleton } from "@/components/ui/skeleton";
 
 const dimensionPresets = [
   { label: "Square (1:1)", width: "1080", height: "1080" },
@@ -52,31 +51,37 @@ const styleOptions = [
     value: "sketch",
     label: "Sketch",
     prompt: ", (pencil sketch style:1.4), (pencil sketch)",
+    preview: "/sketch.png"
   },
   {
     value: "anime",
     label: "Anime",
     prompt: ", (anime art style:1.4), (anime)",
+    preview: "/anime.png"
   },
   {
     value: "abstract",
     label: "Abstract",
     prompt: ", (abstract art style:1.4), (abstract painting)",
+    preview: "/abstract.png"
   },
   {
     value: "cartoon",
     label: "Cartoon",
     prompt: ", (cartoon style:1.4), (cartoon)",
+    preview: "/cartoon.png"
   },
   {
     value: "watercolor",
     label: "Watercolor",
     prompt: "(watercolor painting style:1.4), (watercolor)",
+    preview: "/watercolor.png"
   },
   {
     value: "realistic Human",
-    label: "Realistic Human",
+    label: "Realistic",
     prompt: ", (realistic), (masterpiece), (perfect photo)",
+    preview: "/realistic.png"
   },
 ] as const;
 
@@ -136,16 +141,16 @@ const CreatePage = () => {
 
       if (response.status === 200) {
         setOutputImage(data.url);
-      } else if (response.status === 400 && data.error) {
-        toast.error(data.error, {
+      } else if (response.status === 401) {
+        toast.error("Create account to generate images", {
           style: {
             borderRadius: "10px",
             background: "#333",
             color: "#fff",
           },
         });
-      } else {
-        toast.error("Create account to generate images", {
+      } else if (data.error) {
+        toast.error(data.error, {
           style: {
             borderRadius: "10px",
             background: "#333",
@@ -168,167 +173,222 @@ const CreatePage = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 min-h-[calc(100dvh-4rem)]">
-      <div className="text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">Create Your AI Image</h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Choose your preferred model and settings to generate unique AI artwork.
-        </p>
-      </div>
+    <div className="min-h-[calc(100dvh-4rem)]">
+      <div className="absolute inset-0 bg-gradient-to-b from-background/80 to-background" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
-        <div className="space-y-6">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="imagePrompt"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Image Prompt</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Textarea
-                          placeholder="Describe the image you want to create..."
-                          className="h-32 resize-none pr-12"
-                          {...field}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="model"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>AI Model</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a model" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {modelOptions.map((model) => (
-                            <SelectItem key={model.value} value={model.value}>
-                              {model.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="dimensionPreset"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Aspect Ratio</FormLabel>
-                      <Select
-                        onValueChange={handleDimensionPresetChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select dimensions" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {dimensionPresets.map((preset) => (
-                            <SelectItem key={preset.label} value={preset.label}>
-                              {preset.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="style"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Add a Style</FormLabel>
-                    <Select onValueChange={handleStyleChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Add a style" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {styleOptions.map((style) => (
-                          <SelectItem key={style.value} value={style.value}>
-                            {style.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="nsfw"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm transition-colors hover:bg-accent/50">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">NSFW Content</FormLabel>
-                      <FormDescription>Toggle to allow NSFW content generation</FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <Button type="submit" className="w-full transition-all" disabled={loading} size="lg">
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Generating your masterpiece...
-                  </>
-                ) : (
-                  "Generate Image"
-                )}
-              </Button>
-            </form>
-          </Form>
+      <div className="relative">
+        <div className="text-center pt-4 pb-8 space-y-3">
+          <h1 className="text-4xl md:text-5xl tracking-tight bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent">
+            Create Your AI Masterpiece
+          </h1>
         </div>
 
-        <div className="bg-muted rounded-lg flex items-center justify-center min-h-[600px] relative overflow-hidden shadow-lg">
-          {loading ? (
-            <Skeleton className="w-full h-full" />
-          ) : outputImage ? (
-            <Image
-              src={outputImage}
-              alt="Generated Image"
-              className="rounded-lg object-contain transition-all"
-              fill
-              priority
-            />
-          ) : (
-            <div className="text-center space-y-4 p-6">
-              <p className="text-muted-foreground text-lg">Your masterpiece awaits...</p>
-              <p className="text-sm text-muted-foreground">
-                Fill out the form to generate your unique AI artwork
-              </p>
+        <div className="max-w-7xl mx-auto px-4 mt-6 mb-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+            <div className="p-4">
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="imagePrompt"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-base font-semibold">Describe Your Vision</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Textarea
+                              placeholder="A serene landscape with mountains reflecting in a crystal-clear lake..."
+                              className="h-24 resize-none pr-12 text-sm"
+                              {...field}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="model"
+                      render={({ field }) => (
+                        <FormItem className="bg-background/50 rounded-md pt-1">
+                          <FormLabel className="text-base font-medium">AI Model</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="h-9">
+                                <SelectValue placeholder="Select a model" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {modelOptions.map((model) => (
+                                <SelectItem
+                                  key={model.value}
+                                  value={model.value}
+                                  className="cursor-pointer hover:bg-accent"
+                                >
+                                  {model.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="dimensionPreset"
+                      render={({ field }) => (
+                        <FormItem className="bg-background/50 rounded-md pt-1">
+                          <FormLabel className="text-base font-medium">Dimensions</FormLabel>
+                          <Select
+                            onValueChange={handleDimensionPresetChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="h-9">
+                                <SelectValue placeholder="Choose size" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {dimensionPresets.map((preset) => (
+                                <SelectItem
+                                  key={preset.label}
+                                  value={preset.label}
+                                  className="cursor-pointer hover:bg-accent"
+                                >
+                                  {preset.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="style"
+                    render={({ field }) => (
+                      <FormItem className="bg-background/50 rounded-md pt-1">
+                        <FormLabel className="text-base font-medium">Art Style</FormLabel>
+                        <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mt-1">
+                          {styleOptions.map((style) => (
+                            <button
+                              key={style.value}
+                              type="button"
+                              onClick={() => handleStyleChange(style.value)}
+                              className={`group relative aspect-square rounded-md overflow-hidden transition-all ${
+                                field.value === style.value
+                                  ? "ring-2 ring-primary"
+                                  : "hover:ring-2 hover:ring-primary/50"
+                              }`}
+                            >
+                              <Image
+                                src={style.preview}
+                                alt={style.label}
+                                fill
+                                className="object-cover"
+                              />
+                              <div className="absolute inset-0 bg-black/40 flex items-end p-1">
+                                <span className="text-xs text-white font-medium truncate w-full text-center">
+                                  {style.label}
+                                </span>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="nsfw"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center justify-between rounded-md border p-3 shadow-sm transition-all hover:bg-accent/50">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-sm font-medium">NSFW Content</FormLabel>
+                          <FormDescription className="text-xs">
+                            Toggle to allow NSFW content generation
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button
+                    type="submit"
+                    className="w-full h-10 text-sm font-medium transition-all"
+                    disabled={loading}
+                    size="default"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Creating Magic...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-4 w-4" />
+                        Generate Image
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </Form>
             </div>
-          )}
+
+            <div className="md:sticky md:top-4">
+              <div className="bg-card rounded-lg overflow-hidden border shadow-sm">
+                <div className="p-3 border-b bg-muted">
+                  <h2 className="text-sm font-semibold flex items-center gap-2">
+                    <ImageIcon className="h-4 w-4" />
+                    Preview
+                  </h2>
+                </div>
+                <div className="aspect-square relative">
+                  {loading ? (
+                    <div className="absolute inset-0 flex items-center justify-center bg-muted">
+                      <div className="space-y-4 text-center">
+                        <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+                        <p className="text-sm text-muted-foreground">
+                          Generating your masterpiece...
+                        </p>
+                      </div>
+                    </div>
+                  ) : outputImage ? (
+                    <Image
+                      src={outputImage}
+                      alt="Generated Image"
+                      className="object-contain"
+                      fill
+                      priority
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center bg-muted">
+                      <div className="text-center space-y-4 p-6 max-w-md">
+                        <ImageIcon className="h-8 w-8 mx-auto text-muted-foreground" />
+                        <p className="text-md font-medium">Your Canvas Awaits</p>
+                        <p className="text-sm text-muted-foreground">
+                          Write the prompt to bring your imagination to life
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
