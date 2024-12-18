@@ -37,7 +37,7 @@ const dimensionPresets = [
 ] as const;
 
 const modelOptions = [
-  { value: "flux", label: "FLUX" },
+  { value: "flux", label: "FLUX Schnell" },
   { value: "flux-realism", label: "FLUX Realism" },
   { value: "flux-cablyai", label: "FLUX CablyAI" },
   { value: "flux-anime", label: "FLUX Anime" },
@@ -47,11 +47,45 @@ const modelOptions = [
   { value: "turbo", label: "Turbo" },
 ] as const;
 
+const styleOptions = [
+  {
+    value: "sketch",
+    label: "Sketch",
+    prompt: ", (pencil sketch style:1.4), (pencil sketch)",
+  },
+  {
+    value: "anime",
+    label: "Anime",
+    prompt: ", (anime art style:1.4), (anime)",
+  },
+  {
+    value: "abstract",
+    label: "Abstract",
+    prompt: ", (abstract art style:1.4), (abstract painting)",
+  },
+  {
+    value: "cartoon",
+    label: "Cartoon",
+    prompt: ", (cartoon style:1.4), (cartoon)",
+  },
+  {
+    value: "watercolor",
+    label: "Watercolor",
+    prompt: "(watercolor painting style:1.4), (watercolor)",
+  },
+  {
+    value: "realistic Human",
+    label: "Realistic Human",
+    prompt: ", (realistic), (masterpiece), (perfect photo)",
+  },
+] as const;
+
 const formSchema = z.object({
   imagePrompt: z.string().min(5, { message: "Please provide a longer description." }),
   model: z.string().min(1, { message: "Please select a model" }),
   dimensionPreset: z.string().min(1, { message: "Please select a dimension" }),
   nsfw: z.boolean().default(false),
+  style: z.string().optional(),
 });
 
 const CreatePage = () => {
@@ -70,6 +104,16 @@ const CreatePage = () => {
 
   const handleDimensionPresetChange = (value: string) => {
     form.setValue("dimensionPreset", value);
+  };
+
+  const handleStyleChange = (value: string) => {
+    const selectedStyle = styleOptions.find((style) => style.value === value);
+    const currentPrompt = form.getValues("imagePrompt");
+
+    if (selectedStyle) {
+      form.setValue("imagePrompt", `${currentPrompt}${selectedStyle.prompt}`);
+      form.setValue("style", value);
+    }
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -110,7 +154,7 @@ const CreatePage = () => {
         });
       }
     } catch (error) {
-      console.error('Error generating image:', error);
+      console.error("Error generating image:", error);
       toast.error("Failed to generate image", {
         style: {
           borderRadius: "10px",
@@ -210,6 +254,31 @@ const CreatePage = () => {
                   )}
                 />
               </div>
+
+              <FormField
+                control={form.control}
+                name="style"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Add a Style</FormLabel>
+                    <Select onValueChange={handleStyleChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Add a style" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {styleOptions.map((style) => (
+                          <SelectItem key={style.value} value={style.value}>
+                            {style.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <FormField
                 control={form.control}
