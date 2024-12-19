@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import Header from "./components/Header";
 import Provider from "./provider";
 import { Toaster } from "react-hot-toast";
 
@@ -70,7 +69,6 @@ export default function RootLayout({
         >
           <Provider>
             <div className="max-w-7xl mx-auto">
-              <Header />
               {children}
               <Toaster position="bottom-right" reverseOrder={false} />
             </div>
