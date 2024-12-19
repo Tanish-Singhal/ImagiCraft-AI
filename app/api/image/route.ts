@@ -28,12 +28,12 @@ export async function POST(request: NextRequest) {
 
   const randomSeed = randomeNumberGenerator();
 
-  const imageURL = `https://image.pollinations.ai/prompt/${encodeURIComponent(
+  const imageURL = `${process.env.IMAGE_API_URL}/prompt/${encodeURIComponent(
     body.imagePrompt
   )}?seed=${randomSeed}&width=${body.width}&height=${body.height}&nologo=True&model=${body.model}&safe=${!body.nsfw}`;
-
-  const response = await fetch(imageURL);
   
+  const response = await fetch(imageURL);
+
   const responseText = await response.text();
   if (responseText.includes("NSFW content detected")) {
     return NextResponse.json(

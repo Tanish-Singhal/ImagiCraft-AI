@@ -97,6 +97,7 @@ const formSchema = z.object({
 const CreatePage = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [outputImage, setOutputImage] = useState<string | null>(null);
+  const [enhancing, setEnhancing] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -119,6 +120,57 @@ const CreatePage = () => {
     if (selectedStyle) {
       form.setValue("imagePrompt", `${currentPrompt}${selectedStyle.prompt}`);
       form.setValue("style", value);
+    }
+  };
+
+  const handleEnhancePrompt = async () => {
+    const currentPrompt = form.getValues("imagePrompt");
+    if (!currentPrompt) {
+      toast.error("Please write a prompt first", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+      return;
+    }
+
+    try {
+      setEnhancing(true);
+      const response = await fetch("/api/enhance-prompt", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt: currentPrompt }),
+      });
+
+      const data = await response.json();
+      
+      if (response.ok && data.enhancedPrompt) {
+        form.setValue("imagePrompt", data.enhancedPrompt);
+        toast.success("Prompt enhanced!", {
+          style: {
+            borderRadius: "10px",
+            background: "#333",
+            color: "#fff",
+          },
+        });
+      } else {
+        throw new Error(data.error || "Failed to enhance prompt");
+      }
+    } catch (error) {
+      console.error("Failed to enhance prompt:", error);
+      toast.error("Failed to enhance prompt", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+    } finally {
+      setEnhancing(false);
     }
   };
 
@@ -178,8 +230,8 @@ const CreatePage = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-background/80 to-background" />
 
       <div className="relative">
-        <div className="text-center pt-4 pb-8 space-y-3">
-          <h1 className="text-4xl md:text-5xl tracking-tight bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent">
+        <div className="text-center pt-6 pb-10 space-y-3">
+          <h1 className="text-4xl md:text-5xl tracking-tight bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent font-semibold">
             Create Your AI Masterpiece
           </h1>
         </div>
@@ -210,8 +262,10 @@ const CreatePage = () => {
                                     size="icon"
                                     variant="ghost"
                                     className="absolute bottom-2 right-3 h-7 w-7 hover:bg-accent"
+                                    onClick={handleEnhancePrompt}
+                                    disabled={enhancing}
                                   >
-                                    <Sparkles className="h-4 w-4" />
+                                    <Sparkles className={`h-4 w-4 ${enhancing ? 'animate-pulse' : ''}`} />
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -347,13 +401,18 @@ const CreatePage = () => {
                   <Button
                     type="submit"
                     className="w-full h-10 text-sm font-medium transition-all"
-                    disabled={loading}
+                    disabled={loading || enhancing}
                     size="default"
                   >
                     {loading ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin" />
                         Creating Magic...
+                      </>
+                    ) : enhancing ? (
+                      <>
+                        <Sparkles className="h-4 w-4 animate-pulse" />
+                        Enhancing Prompt...
                       </>
                     ) : (
                       <>
