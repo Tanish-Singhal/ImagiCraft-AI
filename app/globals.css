@@ -86,3 +86,24 @@ body {
   background-image: radial-gradient(circle at 1px 1px, hsl(var(--muted)) 1px, transparent 0);
   background-size: 24px 24px;
 }
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--secondary));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--secondary));
+}

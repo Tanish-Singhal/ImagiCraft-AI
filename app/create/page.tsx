@@ -1,7 +1,7 @@
 "use client";
 
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Sparkles, ImageIcon } from "lucide-react";
+import { Loader2, Sparkles, ImageIcon, History } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -27,6 +27,7 @@ import Image from "next/image";
 import toast from "react-hot-toast";
 import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useRouter } from "next/navigation";
 
 const dimensionPresets = [
   { label: "Square (1:1)", width: "1080", height: "1080" },
@@ -52,37 +53,37 @@ const styleOptions = [
     value: "sketch",
     label: "Sketch",
     prompt: ", (pencil sketch style:1.4), (pencil sketch)",
-    preview: "/sketch.png"
+    preview: "/sketch.png",
   },
   {
     value: "anime",
     label: "Anime",
     prompt: ", (anime art style:1.4), (anime)",
-    preview: "/anime.png"
+    preview: "/anime.png",
   },
   {
     value: "abstract",
     label: "Abstract",
     prompt: ", (abstract art style:1.4), (abstract painting)",
-    preview: "/abstract.png"
+    preview: "/abstract.png",
   },
   {
     value: "cartoon",
     label: "Cartoon",
     prompt: ", (cartoon style:1.4), (cartoon)",
-    preview: "/cartoon.png"
+    preview: "/cartoon.png",
   },
   {
     value: "watercolor",
     label: "Watercolor",
     prompt: "(watercolor painting style:1.4), (watercolor)",
-    preview: "/watercolor.png"
+    preview: "/watercolor.png",
   },
   {
     value: "realistic Human",
     label: "Realistic",
     prompt: ", (realistic), (masterpiece), (perfect photo)",
-    preview: "/realistic.png"
+    preview: "/realistic.png",
   },
 ] as const;
 
@@ -95,6 +96,7 @@ const formSchema = z.object({
 });
 
 const CreatePage = () => {
+  const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const [outputImage, setOutputImage] = useState<string | null>(null);
   const [enhancing, setEnhancing] = useState(false);
@@ -147,7 +149,7 @@ const CreatePage = () => {
       });
 
       const data = await response.json();
-      
+
       if (response.ok && data.enhancedPrompt) {
         form.setValue("imagePrompt", data.enhancedPrompt);
         toast.success("Prompt enhanced!", {
@@ -230,13 +232,13 @@ const CreatePage = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-background/80 to-background" />
 
       <div className="relative">
-        <div className="text-center pt-6 pb-10 space-y-3">
+        <div className="text-center pt-6 pb-8 space-y-3">
           <h1 className="text-4xl md:text-5xl tracking-tight bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent font-semibold">
             Create Your AI Masterpiece
           </h1>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 mt-6 mb-10">
+        <div className="max-w-7xl mx-auto px-4 mt-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
             <div className="p-4">
               <Form {...form}>
@@ -246,7 +248,9 @@ const CreatePage = () => {
                     name="imagePrompt"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-base font-semibold">Describe Your Vision</FormLabel>
+                        <FormLabel className="text-base font-semibold">
+                          Describe Your Vision
+                        </FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Textarea
@@ -265,7 +269,9 @@ const CreatePage = () => {
                                     onClick={handleEnhancePrompt}
                                     disabled={enhancing}
                                   >
-                                    <Sparkles className={`h-4 w-4 ${enhancing ? 'animate-pulse' : ''}`} />
+                                    <Sparkles
+                                      className={`h-4 w-4 ${enhancing ? "animate-pulse" : ""}`}
+                                    />
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -346,7 +352,7 @@ const CreatePage = () => {
                   <FormField
                     control={form.control}
                     name="style"
-                    render={({ field }) => (
+                    render={() => (
                       <FormItem className="bg-background/50 rounded-md pt-1">
                         <FormLabel className="text-base font-medium">Art Style</FormLabel>
                         <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mt-1">
@@ -355,11 +361,7 @@ const CreatePage = () => {
                               key={style.value}
                               type="button"
                               onClick={() => handleStyleChange(style.value)}
-                              className={`group relative aspect-square rounded-md overflow-hidden transition-all ${
-                                field.value === style.value
-                                  ? "ring-2 ring-primary"
-                                  : "hover:ring-2 hover:ring-primary/50"
-                              }`}
+                              className={`group relative aspect-square rounded-md overflow-hidden transition-all hover:ring-2 hover:ring-primary`}
                             >
                               <Image
                                 src={style.preview}
@@ -466,6 +468,16 @@ const CreatePage = () => {
               </div>
             </div>
           </div>
+        </div>
+        <div className="max-w-7xl flex justify-center px-4">
+          <Button
+            onClick={() => router.push("/history")}
+            variant="outline"
+            className="w-full md:w-auto flex items-center gap-2"
+          >
+            <History className="h-4 w-4" />
+            View Generation History
+          </Button>
         </div>
       </div>
     </div>

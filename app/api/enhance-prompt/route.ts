@@ -13,14 +13,14 @@ export async function POST(request: NextRequest) {
   const basePrompt = body.prompt;
 
   const systemPrompt = encodeURIComponent(
-    "You are an AI expert at enhancing image generation prompts. Enhance the given prompt by keeping the core idea but make it more detailed and visually rich."
+    "You are an AI expert at enhancing image generation prompts. Enhance the given prompt by keeping the core idea but make it more detailed and visually rich. But do not make the prompt too long, make it under 100 words."
   );
 
   const promptToEnhance = encodeURIComponent(basePrompt);
 
   try {
     const response = await fetch(
-      `https://text.pollinations.ai/${promptToEnhance}?model=openai&json=true&system=${systemPrompt}`,
+      `${process.env.TEXT_API_URL}/${promptToEnhance}?model=openai&json=true&system=${systemPrompt}`,
       {
         method: "GET",
         headers: {
@@ -38,6 +38,8 @@ export async function POST(request: NextRequest) {
     const cleanedPrompt = text
       .replace(/"/g, '')
       .replace(/^["']|["']$/g, '')
+      .replace(/\*\*[^*]+\*\*/g, '')
+      .replace(/^\s+|\s+$/g, '')
       .trim();
 
     return NextResponse.json({ enhancedPrompt: cleanedPrompt });
