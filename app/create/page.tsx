@@ -26,6 +26,7 @@ import { useState } from "react";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { Switch } from "@/components/ui/switch";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const dimensionPresets = [
   { label: "Square (1:1)", width: "1080", height: "1080" },
@@ -198,9 +199,26 @@ const CreatePage = () => {
                           <div className="relative">
                             <Textarea
                               placeholder="A serene landscape with mountains reflecting in a crystal-clear lake..."
-                              className="h-24 resize-none pr-12 text-sm"
+                              className="h-32 resize-none pr-12 text-sm"
                               {...field}
                             />
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    type="button"
+                                    size="icon"
+                                    variant="ghost"
+                                    className="absolute bottom-2 right-3 h-7 w-7 hover:bg-accent"
+                                  >
+                                    <Sparkles className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>AI Prompt Enhancer</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
                           </div>
                         </FormControl>
                         <FormMessage />
