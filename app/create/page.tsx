@@ -28,6 +28,16 @@ import toast from "react-hot-toast";
 import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useRouter } from "next/navigation";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const dimensionPresets = [
   { label: "Square (1:1)", width: "1080", height: "1080" },
@@ -100,6 +110,7 @@ const CreatePage = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [outputImage, setOutputImage] = useState<string | null>(null);
   const [enhancing, setEnhancing] = useState(false);
+  const [showNSFWDialog, setShowNSFWDialog] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -150,9 +161,17 @@ const CreatePage = () => {
 
       const data = await response.json();
 
-      if (response.ok && data.enhancedPrompt) {
+      if (response.status === 200) {
         form.setValue("imagePrompt", data.enhancedPrompt);
         toast.success("Prompt enhanced!", {
+          style: {
+            borderRadius: "10px",
+            background: "#333",
+            color: "#fff",
+          },
+        });
+      } else if (response.status === 401) {
+        toast.error("Create account to enhance prompt", {
           style: {
             borderRadius: "10px",
             background: "#333",
@@ -173,6 +192,14 @@ const CreatePage = () => {
       });
     } finally {
       setEnhancing(false);
+    }
+  };
+
+  const handleNSFWChange = (checked: boolean) => {
+    if (checked) {
+      setShowNSFWDialog(true);
+    } else {
+      form.setValue("nsfw", false);
     }
   };
 
@@ -394,11 +421,39 @@ const CreatePage = () => {
                           </FormDescription>
                         </div>
                         <FormControl>
-                          <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          <Switch checked={field.value} onCheckedChange={handleNSFWChange} />
                         </FormControl>
                       </FormItem>
                     )}
                   />
+
+                  <AlertDialog open={showNSFWDialog} onOpenChange={setShowNSFWDialog}>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>NSFW Content Warning</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Enabling NSFW content may generate explicit material not suitable for all
+                          audiences. Proceed only if you are 18 or older.
+                          <div className="font-semibold mt-3">
+                            Are you sure you want to continue?
+                          </div>
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setShowNSFWDialog(false)}>
+                          Cancel
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => {
+                            form.setValue("nsfw", true);
+                            setShowNSFWDialog(false);
+                          }}
+                        >
+                          Proceed
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
 
                   <Button
                     type="submit"
