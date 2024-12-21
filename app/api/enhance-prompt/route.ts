@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   const basePrompt = body.prompt;
 
   const systemPrompt = encodeURIComponent(
-    "You are an AI expert at enhancing image generation prompts. Enhance the given prompt by keeping the core idea but make it more detailed and visually rich. But do not make the prompt too long, make it under 100 words."
+    "As an AI expert in image generation,your task is to improve the clarity and detail of the provided prompt while preserving the core idea. Enhance the description to ensure the generated image is visually rich and captivating. Keep the revised prompt concise and under 100 words, focusing on clear details that would guide the image creation effectively without overcomplicating the request."
   );
 
   const promptToEnhance = encodeURIComponent(basePrompt);

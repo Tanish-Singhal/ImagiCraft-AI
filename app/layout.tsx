@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ImagiCraft AI - Free High Quality AI Image Generator | Create Amazing Art",
+  title: "ImagiCraft AI - High Quality AI Image Generator | Create Amazing Art",
   description:
     "Create stunning AI-generated images for free. Transform your ideas into beautiful artwork using our powerful AI image generator. No credit card required, instant results.",
   keywords:
@@ -25,20 +25,20 @@ export const metadata: Metadata = {
   creator: "ImagiCraft AI",
   publisher: "ImagiCraft AI",
   openGraph: {
-    title: "ImagiCraft AI - Free High Quality AI Image Generator",
+    title: "ImagiCraft AI - High Quality AI Image Generator",
     description:
       "Create stunning AI-generated images for free. Transform your ideas into beautiful artwork using our powerful AI image generator.",
     type: "website",
-    url: "https://imagicraft-ai.com",
+    url: "https://imagicraft-ai.vercel.app",
     siteName: "ImagiCraft AI",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ImagiCraft AI - Free High Quality AI Image Generator",
+    title: "ImagiCraft AI - High Quality AI Image Generator",
     description: "Create stunning AI-generated images for free with ImagiCraft AI",
   },
   alternates: {
-    canonical: "https://imagicraft-ai.com",
+    canonical: "https://imagicraft-ai.vercel.app",
   },
   robots: {
     index: true,
@@ -70,7 +70,7 @@ export default function RootLayout({
           <Provider>
             <div className="max-w-7xl mx-auto">
               {children}
-              <Toaster position="bottom-right" reverseOrder={false} />
+              <Toaster position="top-center" reverseOrder={false} />
             </div>
           </Provider>
         </ThemeProvider>

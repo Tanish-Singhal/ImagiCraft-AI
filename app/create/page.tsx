@@ -1,7 +1,7 @@
 "use client";
 
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Sparkles, ImageIcon, History } from "lucide-react";
+import { Loader2, Sparkles, ImageIcon, History, Download } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -40,7 +40,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import Header from "./components/Header";
 
-const dimensionPresets = [
+const aspectRatioPresets = [
   { label: "Square (1:1)", width: "1080", height: "1080" },
   { label: "Portrait (2:3)", width: "1080", height: "1620" },
   { label: "Landscape (3:2)", width: "1620", height: "1080" },
@@ -101,7 +101,7 @@ const styleOptions = [
 const formSchema = z.object({
   imagePrompt: z.string().min(5, { message: "Please provide a longer description." }),
   model: z.string().min(1, { message: "Please select a model" }),
-  dimensionPreset: z.string().min(1, { message: "Please select a dimension" }),
+  aspectRatioPreset: z.string().min(1, { message: "Please select a aspectRatio" }),
   nsfw: z.boolean().default(false),
   style: z.string().optional(),
 });
@@ -118,13 +118,13 @@ const CreatePage = () => {
     defaultValues: {
       imagePrompt: "",
       model: "flux",
-      dimensionPreset: "Square (1:1)",
+      aspectRatioPreset: "Square (1:1)",
       nsfw: false,
     },
   });
 
-  const handleDimensionPresetChange = (value: string) => {
-    form.setValue("dimensionPreset", value);
+  const handleAspectRatioPresetChange = (value: string) => {
+    form.setValue("aspectRatioPreset", value);
   };
 
   const handleStyleChange = (value: string) => {
@@ -204,10 +204,49 @@ const CreatePage = () => {
     }
   };
 
+  const handleDownload = async () => {
+    if (!outputImage) return;
+
+    try {
+      await toast.promise(
+        (async () => {
+          const response = await fetch(outputImage);
+          const blob = await response.blob();
+
+          const url = window.URL.createObjectURL(blob);
+
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `imagicraft-${Date.now()}.png`;
+          document.body.appendChild(link);
+
+          link.click();
+
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+        })(),
+        {
+          loading: "Downloading your image...",
+          success: "Download completed!",
+          error: "Download failed",
+        },
+        {
+          style: {
+            borderRadius: "10px",
+            background: "#333",
+            color: "#fff",
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Download failed:", error);
+    }
+  };
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setLoading(true);
-      const preset = dimensionPresets.find((p) => p.label === values.dimensionPreset);
+      const preset = aspectRatioPresets.find((p) => p.label === values.aspectRatioPreset);
       const response = await fetch("/api/image", {
         method: "POST",
         headers: {
@@ -269,7 +308,7 @@ const CreatePage = () => {
             </h1>
           </div>
 
-          <div className="max-w-7xl mx-auto px-4 mt-6 mb-8">
+          <div className="max-w-7xl mx-auto px-4 mt-6 mb-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
               <div className="p-4">
                 <Form {...form}>
@@ -349,12 +388,12 @@ const CreatePage = () => {
 
                       <FormField
                         control={form.control}
-                        name="dimensionPreset"
+                        name="aspectRatioPreset"
                         render={({ field }) => (
                           <FormItem className="bg-background/50 rounded-md pt-1">
-                            <FormLabel className="text-base font-medium">Dimensions</FormLabel>
+                            <FormLabel className="text-base font-medium">Aspect Ratio</FormLabel>
                             <Select
-                              onValueChange={handleDimensionPresetChange}
+                              onValueChange={handleAspectRatioPresetChange}
                               defaultValue={field.value}
                             >
                               <FormControl>
@@ -363,7 +402,7 @@ const CreatePage = () => {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                {dimensionPresets.map((preset) => (
+                                {aspectRatioPresets.map((preset) => (
                                   <SelectItem
                                     key={preset.label}
                                     value={preset.label}
@@ -392,7 +431,7 @@ const CreatePage = () => {
                                 key={style.value}
                                 type="button"
                                 onClick={() => handleStyleChange(style.value)}
-                                className={`group relative aspect-square rounded-md overflow-hidden transition-all hover:ring-2 hover:ring-primary`}
+                                className="group relative aspect-square rounded-md overflow-hidden transition-all hover:ring-2 hover:ring-primary"
                               >
                                 <Image
                                   src={style.preview}
@@ -452,6 +491,7 @@ const CreatePage = () => {
                               form.setValue("nsfw", true);
                               setShowNSFWDialog(false);
                             }}
+                            className="bg-destructive text-white hover:bg-red-700"
                           >
                             Proceed
                           </AlertDialogAction>
@@ -488,11 +528,21 @@ const CreatePage = () => {
 
               <div className="md:sticky md:top-4">
                 <div className="bg-card rounded-lg overflow-hidden border shadow-sm">
-                  <div className="p-3 border-b bg-muted">
+                  <div className="p-3 border-b bg-muted flex justify-between items-center">
                     <h2 className="text-sm font-semibold flex items-center gap-2">
                       <ImageIcon className="h-4 w-4" />
                       Preview
                     </h2>
+                    {outputImage && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 px-2"
+                        onClick={handleDownload}
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                   <div className="aspect-square relative">
                     {loading ? (
@@ -528,7 +578,7 @@ const CreatePage = () => {
               </div>
             </div>
           </div>
-          <div className="max-w-7xl flex justify-center px-4">
+          <div className="max-w-7xl flex justify-center px-4 mb-2">
             <Button
               onClick={() => router.push("/images")}
               variant="outline"
