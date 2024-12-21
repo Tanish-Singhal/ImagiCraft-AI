@@ -1,110 +1,22 @@
 "use client";
 
-import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Sparkles, ImageIcon, History, Download } from "lucide-react";
-import { z } from "zod";
+import { Loader2, Sparkles, History } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { useState } from "react";
-import Image from "next/image";
 import toast from "react-hot-toast";
-import { Switch } from "@/components/ui/switch";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useRouter } from "next/navigation";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import Header from "./components/Header";
-
-const aspectRatioPresets = [
-  { label: "Square (1:1)", width: "1080", height: "1080" },
-  { label: "Portrait (2:3)", width: "1080", height: "1620" },
-  { label: "Landscape (3:2)", width: "1620", height: "1080" },
-  { label: "Mobile (9:16)", width: "1080", height: "1920" },
-  { label: "Desktop (16:9)", width: "1920", height: "1080" },
-] as const;
-
-const modelOptions = [
-  { value: "flux", label: "FLUX Schnell" },
-  { value: "flux-realism", label: "FLUX Realism" },
-  { value: "flux-cablyai", label: "FLUX CablyAI" },
-  { value: "flux-anime", label: "FLUX Anime" },
-  { value: "flux-3d", label: "FLUX 3D" },
-  { value: "any-dark", label: "Dark Style" },
-  { value: "flux-pro", label: "FLUX Pro" },
-  { value: "turbo", label: "Turbo" },
-] as const;
-
-const styleOptions = [
-  {
-    value: "sketch",
-    label: "Sketch",
-    prompt: ", (pencil sketch style:1.4), (pencil sketch)",
-    preview: "/sketch.png",
-  },
-  {
-    value: "anime",
-    label: "Anime",
-    prompt: ", (anime art style:1.4), (anime)",
-    preview: "/anime.png",
-  },
-  {
-    value: "abstract",
-    label: "Abstract",
-    prompt: ", (abstract art style:1.4), (abstract painting)",
-    preview: "/abstract.png",
-  },
-  {
-    value: "cartoon",
-    label: "Cartoon",
-    prompt: ", (cartoon style:1.4), (cartoon)",
-    preview: "/cartoon.png",
-  },
-  {
-    value: "watercolor",
-    label: "Watercolor",
-    prompt: "(watercolor painting style:1.4), (watercolor)",
-    preview: "/watercolor.png",
-  },
-  {
-    value: "realistic Human",
-    label: "Realistic",
-    prompt: ", (realistic), (masterpiece), (perfect photo)",
-    preview: "/realistic.png",
-  },
-] as const;
-
-const formSchema = z.object({
-  imagePrompt: z.string().min(5, { message: "Please provide a longer description." }),
-  model: z.string().min(1, { message: "Please select a model" }),
-  aspectRatioPreset: z.string().min(1, { message: "Please select a aspectRatio" }),
-  nsfw: z.boolean().default(false),
-  style: z.string().optional(),
-});
+import ImagePrompt from "./components/ImagePrompt";
+import AIModel from "./components/AIModel";
+import AspectRatio from "./components/AspectRatio";
+import ArtStyle from "./components/ArtStyle";
+import NSFW from "./components/NSFW";
+import ImagePreview from "./components/ImagePreview";
+import { aspectRatioPresets, modelOptions, styleOptions } from "./constants";
+import { FormValues, formSchema } from "./types";
 
 const CreatePage = () => {
   const router = useRouter();
@@ -113,7 +25,7 @@ const CreatePage = () => {
   const [enhancing, setEnhancing] = useState(false);
   const [showNSFWDialog, setShowNSFWDialog] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       imagePrompt: "",
@@ -243,7 +155,7 @@ const CreatePage = () => {
     }
   };
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: FormValues) {
     try {
       setLoading(true);
       const preset = aspectRatioPresets.find((p) => p.label === values.aspectRatioPreset);
@@ -313,191 +225,34 @@ const CreatePage = () => {
               <div className="p-4">
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                    <FormField
-                      control={form.control}
-                      name="imagePrompt"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-base font-semibold">
-                            Describe Your Vision
-                          </FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <Textarea
-                                placeholder="A serene landscape with mountains reflecting in a crystal-clear lake..."
-                                className="h-32 resize-none pr-12 text-sm"
-                                {...field}
-                              />
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Button
-                                      type="button"
-                                      size="icon"
-                                      variant="ghost"
-                                      className="absolute bottom-2 right-3 h-7 w-7 hover:bg-accent"
-                                      onClick={handleEnhancePrompt}
-                                      disabled={enhancing}
-                                    >
-                                      <Sparkles
-                                        className={`h-4 w-4 ${enhancing ? "animate-pulse" : ""}`}
-                                      />
-                                    </Button>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>AI Prompt Enhancer</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                    <ImagePrompt
+                      form={form}
+                      enhancing={enhancing}
+                      handleEnhancePrompt={handleEnhancePrompt}
                     />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="model"
-                        render={({ field }) => (
-                          <FormItem className="bg-background/50 rounded-md pt-1">
-                            <FormLabel className="text-base font-medium">AI Model</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger className="h-9">
-                                  <SelectValue placeholder="Select a model" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {modelOptions.map((model) => (
-                                  <SelectItem
-                                    key={model.value}
-                                    value={model.value}
-                                    className="cursor-pointer hover:bg-accent"
-                                  >
-                                    {model.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                      <AIModel form={form} modelOptions={modelOptions} />
 
-                      <FormField
-                        control={form.control}
-                        name="aspectRatioPreset"
-                        render={({ field }) => (
-                          <FormItem className="bg-background/50 rounded-md pt-1">
-                            <FormLabel className="text-base font-medium">Aspect Ratio</FormLabel>
-                            <Select
-                              onValueChange={handleAspectRatioPresetChange}
-                              defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger className="h-9">
-                                  <SelectValue placeholder="Choose size" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {aspectRatioPresets.map((preset) => (
-                                  <SelectItem
-                                    key={preset.label}
-                                    value={preset.label}
-                                    className="cursor-pointer hover:bg-accent"
-                                  >
-                                    {preset.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
+                      <AspectRatio
+                        form={form}
+                        aspectRatioPresets={aspectRatioPresets}
+                        onAspectRatioChange={handleAspectRatioPresetChange}
                       />
                     </div>
 
-                    <FormField
-                      control={form.control}
-                      name="style"
-                      render={() => (
-                        <FormItem className="bg-background/50 rounded-md pt-1">
-                          <FormLabel className="text-base font-medium">Art Style</FormLabel>
-                          <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mt-1">
-                            {styleOptions.map((style) => (
-                              <button
-                                key={style.value}
-                                type="button"
-                                onClick={() => handleStyleChange(style.value)}
-                                className="group relative aspect-square rounded-md overflow-hidden transition-all hover:ring-2 hover:ring-primary"
-                              >
-                                <Image
-                                  src={style.preview}
-                                  alt={style.label}
-                                  fill
-                                  className="object-cover"
-                                />
-                                <div className="absolute inset-0 bg-black/40 flex items-end p-1">
-                                  <span className="text-xs text-white font-medium truncate w-full text-center">
-                                    {style.label}
-                                  </span>
-                                </div>
-                              </button>
-                            ))}
-                          </div>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                    <ArtStyle
+                      form={form}
+                      styleOptions={styleOptions}
+                      onStyleChange={handleStyleChange}
                     />
 
-                    <FormField
-                      control={form.control}
-                      name="nsfw"
-                      render={({ field }) => (
-                        <FormItem className="flex items-center justify-between rounded-md border p-3 shadow-sm transition-all hover:bg-accent/50">
-                          <div className="space-y-0.5">
-                            <FormLabel className="text-sm font-medium">NSFW Content</FormLabel>
-                            <FormDescription className="text-xs">
-                              Toggle to allow NSFW content generation
-                            </FormDescription>
-                          </div>
-                          <FormControl>
-                            <Switch checked={field.value} onCheckedChange={handleNSFWChange} />
-                          </FormControl>
-                        </FormItem>
-                      )}
+                    <NSFW
+                      form={form}
+                      showNSFWDialog={showNSFWDialog}
+                      setShowNSFWDialog={setShowNSFWDialog}
+                      onNSFWChange={handleNSFWChange}
                     />
-
-                    <AlertDialog open={showNSFWDialog} onOpenChange={setShowNSFWDialog}>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>NSFW Content Warning</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Enabling NSFW content may generate explicit material not suitable for
-                            all audiences. Proceed only if you are 18 or older.
-                            <div className="font-semibold mt-3">
-                              Are you sure you want to continue?
-                            </div>
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel onClick={() => setShowNSFWDialog(false)}>
-                            Cancel
-                          </AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => {
-                              form.setValue("nsfw", true);
-                              setShowNSFWDialog(false);
-                            }}
-                            className="bg-destructive text-white hover:bg-red-700"
-                          >
-                            Proceed
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
 
                     <Button
                       type="submit"
@@ -527,54 +282,11 @@ const CreatePage = () => {
               </div>
 
               <div className="md:sticky md:top-4">
-                <div className="bg-card rounded-lg overflow-hidden border shadow-sm">
-                  <div className="p-3 border-b bg-muted flex justify-between items-center">
-                    <h2 className="text-sm font-semibold flex items-center gap-2">
-                      <ImageIcon className="h-4 w-4" />
-                      Preview
-                    </h2>
-                    {outputImage && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 px-2"
-                        onClick={handleDownload}
-                      >
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                  <div className="aspect-square relative">
-                    {loading ? (
-                      <div className="absolute inset-0 flex items-center justify-center bg-muted">
-                        <div className="space-y-4 text-center">
-                          <Loader2 className="h-8 w-8 animate-spin mx-auto" />
-                          <p className="text-sm text-muted-foreground">
-                            Generating your masterpiece...
-                          </p>
-                        </div>
-                      </div>
-                    ) : outputImage ? (
-                      <Image
-                        src={outputImage}
-                        alt="Generated Image"
-                        className="object-contain"
-                        fill
-                        priority
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center bg-muted">
-                        <div className="text-center space-y-4 p-6 max-w-md">
-                          <ImageIcon className="h-8 w-8 mx-auto text-muted-foreground" />
-                          <p className="text-md font-medium">Your Canvas Awaits</p>
-                          <p className="text-sm text-muted-foreground">
-                            Write the prompt to bring your imagination to life
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <ImagePreview
+                  loading={loading}
+                  outputImage={outputImage}
+                  onDownload={handleDownload}
+                />
               </div>
             </div>
           </div>
