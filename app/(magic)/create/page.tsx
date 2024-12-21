@@ -8,7 +8,6 @@ import { Form } from "@/components/ui/form";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import Header from "./components/Header";
 import ImagePrompt from "./components/ImagePrompt";
 import AIModel from "./components/AIModel";
 import AspectRatio from "./components/AspectRatio";
@@ -207,99 +206,95 @@ const CreatePage = () => {
   }
 
   return (
-    <div>
-      <Header />
+    <div className="min-h-[calc(100dvh-4rem)]">
+      <div className="absolute inset-0 bg-gradient-to-b from-background/80 to-background" />
 
-      <div className="min-h-[calc(100dvh-4rem)]">
-        <div className="absolute inset-0 bg-gradient-to-b from-background/80 to-background" />
+      <div className="relative">
+        <div className="text-center pt-6 pb-8 space-y-3">
+          <h1 className="text-4xl md:text-5xl tracking-tight bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent font-semibold">
+            Create Your AI Masterpiece
+          </h1>
+        </div>
 
-        <div className="relative">
-          <div className="text-center pt-6 pb-8 space-y-3">
-            <h1 className="text-4xl md:text-5xl tracking-tight bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent font-semibold">
-              Create Your AI Masterpiece
-            </h1>
-          </div>
+        <div className="max-w-7xl mx-auto px-4 mt-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+            <div className="p-4">
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <ImagePrompt
+                    form={form}
+                    enhancing={enhancing}
+                    handleEnhancePrompt={handleEnhancePrompt}
+                  />
 
-          <div className="max-w-7xl mx-auto px-4 mt-6 mb-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-              <div className="p-4">
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                    <ImagePrompt
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <AIModel form={form} modelOptions={modelOptions} />
+
+                    <AspectRatio
                       form={form}
-                      enhancing={enhancing}
-                      handleEnhancePrompt={handleEnhancePrompt}
+                      aspectRatioPresets={aspectRatioPresets}
+                      onAspectRatioChange={handleAspectRatioPresetChange}
                     />
+                  </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <AIModel form={form} modelOptions={modelOptions} />
+                  <ArtStyle
+                    form={form}
+                    styleOptions={styleOptions}
+                    onStyleChange={handleStyleChange}
+                  />
 
-                      <AspectRatio
-                        form={form}
-                        aspectRatioPresets={aspectRatioPresets}
-                        onAspectRatioChange={handleAspectRatioPresetChange}
-                      />
-                    </div>
+                  <NSFW
+                    form={form}
+                    showNSFWDialog={showNSFWDialog}
+                    setShowNSFWDialog={setShowNSFWDialog}
+                    onNSFWChange={handleNSFWChange}
+                  />
 
-                    <ArtStyle
-                      form={form}
-                      styleOptions={styleOptions}
-                      onStyleChange={handleStyleChange}
-                    />
+                  <Button
+                    type="submit"
+                    className="w-full h-10 text-sm font-medium transition-all"
+                    disabled={loading || enhancing}
+                    size="default"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Creating Magic...
+                      </>
+                    ) : enhancing ? (
+                      <>
+                        <Sparkles className="h-4 w-4 animate-pulse" />
+                        Enhancing Prompt...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-4 w-4" />
+                        Generate Image
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </Form>
+            </div>
 
-                    <NSFW
-                      form={form}
-                      showNSFWDialog={showNSFWDialog}
-                      setShowNSFWDialog={setShowNSFWDialog}
-                      onNSFWChange={handleNSFWChange}
-                    />
-
-                    <Button
-                      type="submit"
-                      className="w-full h-10 text-sm font-medium transition-all"
-                      disabled={loading || enhancing}
-                      size="default"
-                    >
-                      {loading ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Creating Magic...
-                        </>
-                      ) : enhancing ? (
-                        <>
-                          <Sparkles className="h-4 w-4 animate-pulse" />
-                          Enhancing Prompt...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="h-4 w-4" />
-                          Generate Image
-                        </>
-                      )}
-                    </Button>
-                  </form>
-                </Form>
-              </div>
-
-              <div className="md:sticky md:top-4">
-                <ImagePreview
-                  loading={loading}
-                  outputImage={outputImage}
-                  onDownload={handleDownload}
-                />
-              </div>
+            <div className="md:sticky md:top-4">
+              <ImagePreview
+                loading={loading}
+                outputImage={outputImage}
+                onDownload={handleDownload}
+              />
             </div>
           </div>
-          <div className="max-w-7xl flex justify-center px-4 mb-2">
-            <Button
-              onClick={() => router.push("/images")}
-              variant="outline"
-              className="w-full md:w-auto flex items-center gap-2"
-            >
-              <History className="h-4 w-4" />
-              View Generation History
-            </Button>
-          </div>
+        </div>
+        <div className="max-w-7xl flex justify-center px-4 mb-2">
+          <Button
+            onClick={() => router.push("/images")}
+            variant="outline"
+            className="w-full md:w-auto flex items-center gap-2"
+          >
+            <History className="h-4 w-4" />
+            View Generation History
+          </Button>
         </div>
       </div>
     </div>
