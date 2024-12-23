@@ -56,16 +56,29 @@ export default {
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
   		},
-			keyframes: {
-				shine: {
-					'0%': { backgroundPosition: '200% 0' },
-					'25%': { backgroundPosition: '-200% 0' },
-					'100%': { backgroundPosition: '-200% 0' },
-				},
-			},
-			animation: {
-				shine: 'shine 3s ease-out infinite',
-			},
+  		keyframes: {
+  			shine: {
+  				'0%': {
+  					backgroundPosition: '200% 0',
+  					'background-position': '0% 0%'
+  				},
+  				'25%': {
+  					backgroundPosition: '-200% 0'
+  				},
+  				'100%': {
+  					backgroundPosition: '-200% 0'
+  				},
+  				'50%': {
+  					'background-position': '100% 100%'
+  				},
+  				to: {
+  					'background-position': '0% 0%'
+  				}
+  			}
+  		},
+  		animation: {
+  			shine: 'shine var(--duration) infinite linear'
+  		}
   	}
   },
   plugins: [require("tailwindcss-animate")],
