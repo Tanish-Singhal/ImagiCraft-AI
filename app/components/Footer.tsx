@@ -16,7 +16,7 @@ const Footer = () => {
             <Link href="https://github.com/Tanish-Singhal" className="hover:text-white text-xl">
               <FaGithub />
             </Link>
-            <Link href="https://twitter.com/your-twitter" className="hover:text-white text-xl">
+            <Link href="https://x.com/TanishSing44334" className="hover:text-white text-xl">
               <FaXTwitter />
             </Link>
           </div>

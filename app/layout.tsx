@@ -21,9 +21,9 @@ export const metadata: Metadata = {
     "Create stunning AI-generated images for free. Transform your ideas into beautiful artwork using our powerful AI image generator. No credit card required, instant results.",
   keywords:
     "AI image generator, free AI art, AI artwork creator, image generation, AI art maker, text to image, free image generator",
-  authors: [{ name: "ImagiCraft AI" }],
-  creator: "ImagiCraft AI",
-  publisher: "ImagiCraft AI",
+  authors: [{ name: "Tanish Singhal" }],
+  creator: "Tanish Singhal",
+  publisher: "ImagiCraft AI by Tanish Singhal",
   openGraph: {
     title: "ImagiCraft AI - High Quality AI Image Generator",
     description:
@@ -31,11 +31,20 @@ export const metadata: Metadata = {
     type: "website",
     url: "https://imagicraft-ai.vercel.app",
     siteName: "ImagiCraft AI",
+    images: [
+      {
+        url: '/heroImage.png',
+        width: 1200,
+        height: 630,
+        alt: 'ImagiCraft AI - AI Image Generator',
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "ImagiCraft AI - High Quality AI Image Generator",
     description: "Create stunning AI-generated images for free with ImagiCraft AI",
+    images: ['/heroImage.png'],
   },
   alternates: {
     canonical: "https://imagicraft-ai.vercel.app",
