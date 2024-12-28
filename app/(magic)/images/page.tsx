@@ -3,16 +3,35 @@
 import { Post } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import ImageCard from "./components/ImageCard";
 import ImageDialog from "./components/ImageDialog";
 import Loading from "./components/Loading";
 import EmptyState from "./components/EmptyState";
 
 const Page = () => {
+  const router = useRouter();
   const [loading, setLoading] = useState<boolean>(true);
   const [posts, setPosts] = useState<Post[]>([]);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  const checkAuth = async () => {
+    try {
+      const response = await fetch("/api/auth/check");
+      const data = await response.json();
+      if (!data.authenticated) {
+        router.push("/userauth");
+      }
+    } catch (error) {
+      console.error("Auth check failed:", error);
+      router.push("/userauth");
+    }
+  };
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
 
   const fetchPosts = async () => {
     try {
