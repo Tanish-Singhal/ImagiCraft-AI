@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/app/components/mode-toggle";
-import { ArrowRight } from "lucide-react";
 
 const Header = () => {
   const router = useRouter();
