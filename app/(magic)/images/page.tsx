@@ -14,7 +14,7 @@ const Page = () => {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const fetchPost = async () => {
+  const fetchPosts = async () => {
     try {
       const response = await fetch("/api/image");
       const data = await response.json();
@@ -59,8 +59,35 @@ const Page = () => {
     }
   };
 
+  const handleDelete = async (postId: string) => {
+    try {
+      await toast.promise(
+        fetch(`/api/image?id=${postId}`, {
+          method: "DELETE",
+        }),
+        {
+          loading: "Deleting image...",
+          success: "Image deleted successfully!",
+          error: "Failed to delete image",
+        },
+        {
+          style: {
+            borderRadius: "10px",
+            background: "#333",
+            color: "#fff",
+          },
+        }
+      );
+
+      setDialogOpen(false);
+      await fetchPosts();
+    } catch (error) {
+      console.error("Error deleting image:", error);
+    }
+  };
+
   useEffect(() => {
-    fetchPost();
+    fetchPosts();
   }, []);
 
   return (
@@ -81,6 +108,7 @@ const Page = () => {
                   setDialogOpen(true);
                 }}
                 onDownload={handleDownload}
+                onDelete={() => handleDelete(post.id)}
               />
             ))}
           </div>
@@ -91,6 +119,7 @@ const Page = () => {
           open={dialogOpen}
           onOpenChange={setDialogOpen}
           onDownload={handleDownload}
+          onDelete={() => selectedPost && handleDelete(selectedPost.id)}
         />
       </div>
     </div>

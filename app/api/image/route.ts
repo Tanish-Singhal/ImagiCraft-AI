@@ -84,3 +84,36 @@ export async function GET() {
 
   return NextResponse.json(posts);
 }
+
+export async function DELETE(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized user" }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(request.url);
+  const postId = searchParams.get('id');
+
+  if (!postId) {
+    return NextResponse.json({ error: "Post ID is required" }, { status: 400 });
+  }
+
+  const post = await prisma.post.findUnique({
+    where: { id: postId }
+  });
+
+  if (!post) {
+    return NextResponse.json({ error: "Post not found" }, { status: 404 });
+  }
+
+  if (post.userId !== session.user.id) {
+    return NextResponse.json({ error: "Unauthorized to delete this post" }, { status: 403 });
+  }
+
+  await prisma.post.delete({
+    where: { id: postId }
+  });
+
+  return NextResponse.json({ message: "Post deleted successfully" });
+}
