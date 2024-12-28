@@ -216,7 +216,7 @@ const CreatePage = () => {
           </h1>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 mt-6 mb-6">
+        <div className="max-w-7xl mx-auto px-4 mt-6 mb-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
             <div className="p-4">
               <Form {...form}>
@@ -277,7 +277,7 @@ const CreatePage = () => {
               </Form>
             </div>
 
-            <div className="md:sticky md:top-4">
+            <div>
               <ImagePreview
                 loading={loading}
                 outputImage={outputImage}

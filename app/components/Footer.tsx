@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import { FaGithub, FaXTwitter } from 'react-icons/fa6'
+import { FaGithub, FaXTwitter, FaRegHandPeace } from 'react-icons/fa6'
 
 const Footer = () => {
   return (
@@ -13,11 +13,14 @@ const Footer = () => {
             </p>
           </div>
           <div className="flex space-x-6">
-            <Link href="https://github.com/Tanish-Singhal" className="hover:text-white text-xl">
+            <Link href="https://github.com/Tanish-Singhal" className="hover:text-white text-xl" target="_blank">
               <FaGithub />
             </Link>
-            <Link href="https://x.com/TanishSing44334" className="hover:text-white text-xl">
+            <Link href="https://x.com/TanishSing44334" className="hover:text-white text-xl" target="_blank">
               <FaXTwitter />
+            </Link>
+            <Link href="https://tanish-singhal.vercel.app/" className="hover:text-white text-xl animate-spin" target="_blank">
+              <FaRegHandPeace />
             </Link>
           </div>
         </div>

@@ -70,7 +70,7 @@ const Header = () => {
                 </Avatar>
               </div>
             ) : (
-              <Button onClick={() => router.push("/userauth")}>Get Started</Button>
+              <Button onClick={() => router.push("/userauth")}>Sign In</Button>
             )}
           </div>
         </div>

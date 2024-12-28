@@ -21,15 +21,7 @@ const Header = () => {
 
           <div className="flex items-center gap-4">
             <ModeToggle />
-            <Button
-              effect="expandIcon"
-              icon={ArrowRight}
-              iconPlacement="right"
-              className="gap-2"
-              onClick={() => router.push("/userauth")}
-            >
-              Get Started
-            </Button>
+            <Button onClick={() => router.push("/userauth")}>Sign In</Button>
           </div>
         </div>
       </div>

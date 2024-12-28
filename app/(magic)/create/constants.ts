@@ -63,7 +63,7 @@ export const styleOptions: StyleOption[] = [
   {
     value: "watercolor",
     label: "Watercolor",
-    prompt: "(watercolor painting style:1.4), (watercolor)",
+    prompt: ", (watercolor painting style:1.4), (watercolor)",
     preview: "/watercolor.png",
   },
   {
