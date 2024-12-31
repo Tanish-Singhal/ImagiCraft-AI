@@ -16,6 +16,7 @@ import NSFW from "./components/NSFW";
 import ImagePreview from "./components/ImagePreview";
 import { aspectRatioPresets, modelOptions, styleOptions } from "./constants";
 import { FormValues, formSchema } from "./types";
+import AnimationContainer from "@/components/animationContainer";
 
 const CreatePage = () => {
   const router = useRouter();
@@ -210,13 +211,13 @@ const CreatePage = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-background/80 to-background" />
 
       <div className="relative">
-        <div className="text-center pt-6 pb-8 space-y-3">
+        <AnimationContainer delay={0.3} className="text-center pt-6 pb-8 space-y-3">
           <h1 className="text-4xl md:text-5xl tracking-tight bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent font-semibold">
             Create Your AI Masterpiece
           </h1>
-        </div>
+        </AnimationContainer>
 
-        <div className="max-w-7xl mx-auto px-4 mt-6 mb-4">
+        <AnimationContainer delay={0.5} className="max-w-7xl mx-auto px-4 mt-6 mb-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
             <div className="p-4">
               <Form {...form}>
@@ -285,8 +286,9 @@ const CreatePage = () => {
               />
             </div>
           </div>
-        </div>
-        <div className="max-w-7xl flex justify-center px-4 mb-2">
+        </AnimationContainer>
+
+        <AnimationContainer delay={0.7} className="max-w-7xl flex justify-center px-4 mb-2">
           <Button
             onClick={() => router.push("/images")}
             variant="outline"
@@ -295,7 +297,7 @@ const CreatePage = () => {
             <History className="h-4 w-4" />
             View Generation History
           </Button>
-        </div>
+        </AnimationContainer>
       </div>
     </div>
   );

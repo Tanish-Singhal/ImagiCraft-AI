@@ -5,6 +5,7 @@ import { AuthForm } from "@/components/auth-form";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import AnimationContainer from "@/components/animationContainer";
 
 const AuthContent = () => {
   const { data: session } = useSession();
@@ -29,7 +30,9 @@ const AuthContent = () => {
           </div>
           ImagiCraft AI
         </a>
-        <AuthForm />
+        <AnimationContainer delay={0.3}>
+          <AuthForm />
+        </AnimationContainer>
       </div>
     </div>
   );
